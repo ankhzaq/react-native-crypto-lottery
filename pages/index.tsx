@@ -14,7 +14,7 @@ const Home: NextPage = () => {
   const { contract, isLoading } = useContract(
     process.env.NEXT_PUBLIC_LOTTERY_CONTRACT_ADDRESS
   );
-
+  const { data: expiration } = useContractRead(contract, "expiration");
   const { data: remainingTickets } = useContractRead(
     contract,
     "RemainingTickets",
@@ -125,12 +125,14 @@ const Home: NextPage = () => {
             </div>
 
             <button
-              disabled
+              disabled={
+                expiration?.toString() < Date.now().toString() || remainingTickets?.toNumber() === 0
+              }
               className="mt-5 w-full bg-gradient-to-br from-orange-500
-            to-emerald-600 px-10 py-5 rounded-md rounded-md text-white
-            shadow-xl
-            disabled:from-gray-600 disabled:to-gray-100
-            disabled:cursor-not-allowed"
+              to-emerald-600 px-10 py-5 rounded-md rounded-md text-white
+              shadow-xl
+              disabled:from-gray-600 disabled:to-gray-100
+              disabled:cursor-not-allowed"
             >
               Buy tickets
             </button>
