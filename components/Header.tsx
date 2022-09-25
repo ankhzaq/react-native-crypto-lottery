@@ -1,4 +1,6 @@
 import React from 'react';
+import NavButton from './NavButton';
+import { Bars3BottomRightIcon } from '@heroicons/react/24/solid';
 
 const Header = () => {
   return (
@@ -13,6 +15,16 @@ const Header = () => {
           <h1 className="text-lg text-white font-bold">ZAQUIEL DRAW</h1>
           <p className="text-xs text-emerald-500 truncate">User...</p>
         </div>
+      </div>
+      <div>
+        <div className="bg-[#0A1F1C]">
+          <NavButton isActive title="Buy Tickets" />
+          <NavButton title="Logout" />
+        </div>
+      </div>
+
+      <div>
+        <Bars3BottomRightIcon className="h-8 w-8 mx-auto text-white cursor-pointer" />
       </div>
     </div>
   );
