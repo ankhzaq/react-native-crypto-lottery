@@ -1,12 +1,11 @@
 import type { NextPage } from 'next';
 import Head from 'next/head';
 import Header from '../components/Header';
+import Login from '../components/Login';
 import { useAddress } from '@thirdweb-dev/react';
 
 const Home: NextPage = () => {
   const address = useAddress();
-
-  console.log(address);
 
   if (!address) return (<Login />);
 
