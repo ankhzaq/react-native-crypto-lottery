@@ -26,7 +26,27 @@ const Home: NextPage = () => {
         <title>Zaquiel Draw</title>
       </Head>
       <Header />
-      <h1>Lets build an awesome Lottery WEB3 Dapp!</h1>
+
+      {/* The Next Draw box */}
+      <div className="space-y-5 md:space-y-0 m-5 md:flex md:flex-row items-start justify-center md:space-x-5">
+        <div className="stats-container">
+          <h1 className="text-5xl text-white font-semibold text-center">
+            The Next Draw
+          </h1>
+          <div className="flex justify-between p-2 space-x-2">
+            <div className="stats">
+              <h2 className="text-sm">Total Pool</h2>
+              <p className="text-xl">0.1 MATIC</p>
+            </div>
+            <div className="stats">
+              <h2 className="text-sm">Tickets Remaining</h2>
+              <p className="text-xl">100</p>
+            </div>
+          </div>
+
+          {/* Countdown timer */}
+        </div>
+      </div>
     </div>
   )
 }
