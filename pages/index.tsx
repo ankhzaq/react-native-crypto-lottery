@@ -5,9 +5,11 @@ import Login from '../components/Login';
 import PropagateLoader from 'react-spinners/PropagateLoader';
 import { useAddress, useContract } from '@thirdweb-dev/react';
 import Loading from '../components/Loading';
+import { useState } from 'react';
 
 const Home: NextPage = () => {
   const address = useAddress();
+  const [quantity, setQuantity] = useState<number>(1);
   const { contract, isLoading } = useContract(
     process.env.NEXT_PUBLIC_LOTTERY_CONTRACT_ADDRESS
   );
@@ -45,6 +47,44 @@ const Home: NextPage = () => {
           </div>
 
           {/* Countdown timer */}
+        </div>
+
+        <div className="stats-container space-y-2">
+          <div className="stats-container">
+            <div className="flex justify-between items-center text-white pb-2">
+              <h2>Price per ticket</h2>
+              <p>0.01 MATIC</p>
+            </div>
+          </div>
+
+          <div className="flex text-white items-center space-x-2 bg-[#091B18] border-[#004337] border p-4">
+            <p>TICKETS</p>
+            <input
+              className="flex w-flux bg-transparent text-right outline-none"
+              type="number"
+              min={1}
+              max={10}
+              value={quantity}
+              onChange={(e) => setQuantity(Number(e.target.value))}
+            />
+          </div>
+
+          <div>
+            <div>
+              <p>Total cost of tickets</p>
+              <p>0.999</p>
+            </div>
+
+            <div>
+              <p>Service fees</p>
+              <p>0.001 MATIC</p>
+            </div>
+
+            <div>
+              <p>+ Network Fees</p>
+              <p>TBC</p>
+            </div>
+          </div>
         </div>
       </div>
     </div>
