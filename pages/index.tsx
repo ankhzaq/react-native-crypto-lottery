@@ -2,10 +2,11 @@ import type { NextPage } from 'next';
 import Head from 'next/head';
 import Header from '../components/Header';
 import Login from '../components/Login';
-import PropagateLoader from 'react-spinners/PropagateLoader';
 import { useAddress, useContract, useContractRead } from '@thirdweb-dev/react';
 import Loading from '../components/Loading';
 import { useState } from 'react';
+import { ethers } from 'ethers';
+import { currency } from '../constants';
 
 const Home: NextPage = () => {
   const address = useAddress();
@@ -17,7 +18,14 @@ const Home: NextPage = () => {
   const { data: remainingTickets } = useContractRead(
     contract,
     "RemainingTickets",
+  );
+  const { data: currentWinningReward } = useContractRead(
+    contract,
+    "currentWinningReward",
   )
+
+  const { data: ticketPrice } = useContractRead(contract, "ticketPrice");
+  const { data: ticketCommission } = useContractRead(contract, "ticketCommission");
 
   if (isLoading) {
     return (
@@ -78,12 +86,24 @@ const Home: NextPage = () => {
             <div className="space-y-2 mt-5">
               <div className="flex items-center justify-between text-emerald-300 text-sm italic font-extrabold">
                 <p>Total cost of tickets</p>
-                <p>0.999</p>
+                <p>
+                  {
+                    (ticketPrice && Number(ethers.utils.formatEther(ticketPrice?.toString())))  * quantity
+                  }
+                  {" "}
+                  {currency}
+                </p>
               </div>
 
               <div className="flex items-center justify-between text-emerald-300 text-xs italic">
                 <p>Service fees</p>
-                <p>0.001 MATIC</p>
+                <p>
+                  {
+                    ticketCommission && ethers.utils.formatEther(ticketCommission?.toString())
+                  }
+                  {" "}
+                  {currency}
+                </p>
               </div>
 
               <div className="flex items-center justify-between text-emerald-300 text-xs italic">
