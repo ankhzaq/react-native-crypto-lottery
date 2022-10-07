@@ -52,7 +52,13 @@ const Home: NextPage = () => {
             <div className="flex justify-between p-2 space-x-2">
               <div className="stats">
                 <h2 className="text-sm">Total Pool</h2>
-                <p className="text-xl">0.1 MATIC</p>
+                <p className="text-xl">
+                  {
+                    currentWinningReward && ethers.utils.formatEther(currentWinningReward.toString())
+                  }
+                  {" "}
+                  {currency}
+                </p>
               </div>
               <div className="stats">
                 <h2 className="text-sm">Tickets Remaining</h2>
