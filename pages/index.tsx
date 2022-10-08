@@ -73,7 +73,13 @@ const Home: NextPage = () => {
             <div className="stats-container">
               <div className="flex justify-between items-center text-white pb-2">
                 <h2>Price per ticket</h2>
-                <p>0.01 MATIC</p>
+                <p>
+                  {
+                    ticketPrice && ethers.utils.formatEther(ticketPrice.toString())
+                  }
+                  {" "}
+                  {currency}
+                </p>
               </div>
             </div>
 
