@@ -2,12 +2,13 @@ import type { NextPage } from 'next';
 import Head from 'next/head';
 import Header from '../components/Header';
 import Login from '../components/Login';
-import { useAddress, useContract, useContractRead } from '@thirdweb-dev/react';
+import { useAddress, useContract, useContractRead, useContractCall } from '@thirdweb-dev/react';
 import Loading from '../components/Loading';
 import { useState } from 'react';
 import { ethers } from 'ethers';
 import { currency } from '../constants';
 import CountdownTimer from '../components/CountdownTimer';
+import toast from 'react-hot-toast';
 
 const Home: NextPage = () => {
   const address = useAddress();
@@ -27,6 +28,31 @@ const Home: NextPage = () => {
 
   const { data: ticketPrice } = useContractRead(contract, "ticketPrice");
   const { data: ticketCommission } = useContractRead(contract, "ticketCommission");
+  const { mutateAsync: BuyTickets } = useContractCall(contract, "BuyTickets");
+
+  const handleClick = async () => {
+    if (!ticketPrice) {
+
+    }
+
+    const notification = toast.loading("Buying your tickets...");
+
+    try {
+      const data = await BuyTickets({
+        value: ethers.utils.parseEther((Number(ethers.utils.formatEther(ticketPrice)) * quantity).toString())
+      });
+      toast.success("Tickets purchased successfully!", {
+        id: notification
+      });
+      console.info("contract call successs", data);
+    } catch (error) {
+      toast.error("Whoops something went wrong!", {
+        id: notification
+      });
+
+      console.error("contract call failure",error);
+    }
+  }
 
   if (isLoading) {
     return (
@@ -132,6 +158,7 @@ const Home: NextPage = () => {
               disabled={
                 expiration?.toString() < Date.now().toString() || remainingTickets?.toNumber() === 0
               }
+              onClick={handleClick}
               className="mt-5 w-full bg-gradient-to-br from-orange-500
               to-emerald-600 px-10 py-5 rounded-md rounded-md text-white
               shadow-xl
