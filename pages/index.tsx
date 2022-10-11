@@ -38,9 +38,11 @@ const Home: NextPage = () => {
     const notification = toast.loading("Buying your tickets...");
 
     try {
-      const data = await BuyTickets({
-        value: ethers.utils.parseEther((Number(ethers.utils.formatEther(ticketPrice)) * quantity).toString())
-      });
+      const data = await BuyTickets([
+        {
+          value: ethers.utils.parseEther((Number(ethers.utils.formatEther(ticketPrice)) * quantity).toString())
+        }
+      ]);
       toast.success("Tickets purchased successfully!", {
         id: notification
       });
@@ -165,7 +167,12 @@ const Home: NextPage = () => {
               disabled:from-gray-600 disabled:to-gray-100
               disabled:cursor-not-allowed"
             >
-              Buy tickets
+              Buy {quantity} tickets for {" "}
+              {
+                ticketPrice && Number(ethers.utils.formatEther(ticketPrice.toString())) * quantity
+              }
+              {" "}
+              {currency}
             </button>
           </div>
         </div>
