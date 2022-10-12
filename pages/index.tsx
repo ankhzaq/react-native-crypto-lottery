@@ -4,7 +4,7 @@ import Header from '../components/Header';
 import Login from '../components/Login';
 import { useAddress, useContract, useContractRead, useContractCall } from '@thirdweb-dev/react';
 import Loading from '../components/Loading';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ethers } from 'ethers';
 import { currency } from '../constants';
 import CountdownTimer from '../components/CountdownTimer';
@@ -12,6 +12,7 @@ import toast from 'react-hot-toast';
 
 const Home: NextPage = () => {
   const address = useAddress();
+  const [userTickets, setUserTickets] = useState(0);
   const [quantity, setQuantity] = useState<number>(1);
   const { contract, isLoading } = useContract(
     process.env.NEXT_PUBLIC_LOTTERY_CONTRACT_ADDRESS
@@ -28,7 +29,16 @@ const Home: NextPage = () => {
 
   const { data: ticketPrice } = useContractRead(contract, "ticketPrice");
   const { data: ticketCommission } = useContractRead(contract, "ticketCommission");
+  const { data: tickets } = useContractRead(contract, "getTickets");
   const { mutateAsync: BuyTickets } = useContractCall(contract, "BuyTickets");
+
+  useEffect(() => {
+    if (!tickets) return;
+    const totalTickets: string[] = tickets;
+
+    const noOfUserTickets = totalTickets.reduce((total, ticketAddress) => (ticketAddress === address ? total + 1 :total), 0);
+    setUserTickets(noOfUserTickets);
+  }, [tickets, address]);
 
   const handleClick = async () => {
     if (!ticketPrice) {
@@ -175,6 +185,16 @@ const Home: NextPage = () => {
               {currency}
             </button>
           </div>
+          {userTickets > 0 && (
+            <div className="stats">
+              <p className="text-lg mb-2">you have {userTickets} Tickets in this draw</p>
+              <div className="flex max-w-sm flex-wrap gap-x-2 gap-y-2">
+                {Array(userTickets).fill("").map((_, index) => (
+                  <p key={index} className="text-emerald-300 h-20 w-12 bg-emerald-500/30 rounded-lg flex flex-shrink-0 items-center justify-center text-xs italic">{index + 1}</p>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
