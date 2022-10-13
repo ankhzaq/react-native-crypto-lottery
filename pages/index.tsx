@@ -2,13 +2,14 @@ import type { NextPage } from 'next';
 import Head from 'next/head';
 import Header from '../components/Header';
 import Login from '../components/Login';
-import { useAddress, useContract, useContractRead, useContractCall } from '@thirdweb-dev/react';
+import { useAddress, useContract, useContractRead, useContractCall, useContractWrite } from '@thirdweb-dev/react';
 import Loading from '../components/Loading';
 import { useEffect, useState } from 'react';
 import { ethers } from 'ethers';
 import { currency } from '../constants';
 import CountdownTimer from '../components/CountdownTimer';
 import toast from 'react-hot-toast';
+import Marquee from "react-fast-marquee";
 
 const Home: NextPage = () => {
   const address = useAddress();
@@ -30,7 +31,14 @@ const Home: NextPage = () => {
   const { data: ticketPrice } = useContractRead(contract, "ticketPrice");
   const { data: ticketCommission } = useContractRead(contract, "ticketCommission");
   const { data: tickets } = useContractRead(contract, "getTickets");
-  const { mutateAsync: BuyTickets } = useContractCall(contract, "BuyTickets");
+  const { mutateAsync: BuyTickets } = useContractWrite(contract, "BuyTickets");
+
+  const { data: winnings } = useContractRead(contract, "getWinningsForAddress", address);
+  const { mutateAsync: WithdrawWinning } = useContractWrite(contract, "WithdrawWinning");
+  const { data: lastWinner } = useContractRead(contract, "lastWinner");
+  const { data: lastWinnerAmount } = useContractRead(contract, "lastWinnerAmount");
+  const { data: isLotteryOperator } = useContractRead(contract, "lotteryOperator");
+
 
   useEffect(() => {
     if (!tickets) return;
@@ -66,6 +74,24 @@ const Home: NextPage = () => {
     }
   }
 
+  const onWithdrawWinnings = async (p: {}[]) => {
+    const notification = toast.loading("Withdrawing winnings...");
+
+    try {
+      const data = await onWithdrawWinnings([{}]);
+
+      toast.success("Winnings withdraw successfully!", {
+        id: notification,
+      });
+    } catch (error) {
+      toast.error("Whoops something went wrong!", {
+        id: notification,
+      });
+
+      console.error("contract call failure", error);
+    }
+  }
+
   if (isLoading) {
     return (
       <Loading loading={isLoading} />
@@ -81,7 +107,39 @@ const Home: NextPage = () => {
       </Head>
       <div className="flex-1">
         <Header />
-
+        <Marquee className="bg-[#0A1F1C] p-5 mb-5" gradient={false} speed={100}>
+          <div className="flex space-x-2 mx-10">
+            <h4 className="text-white font-bold">Last Winner: {lastWinner?.toString()}</h4>
+            <h4 className="text-white font-bold">
+              Previous winnings:{" "}
+              {lastWinnerAmount && ethers.utils.formatEther(lastWinnerAmount?.toString())}
+              {" "}
+              {currency}
+              {" "}
+            </h4>
+          </div>
+        </Marquee>
+        {isLotteryOperator === address && (
+          <div className="flex justify-center">
+            <AdminControls />
+          </div>
+        )}
+        {
+          winnings > 0 && (
+            <div className="max-w-md md:max-w-2xl lg:max-w-4xl mx-auto mt-5">
+              <button onClick={onWithdrawWinnings} className="p-5 bg-gradient-to-b from-orange-500 to-emerald-600 animate-pulse text-center rounded-xl w-full">
+                <p className="font-bold">Winner Winner Chicken Dinner!</p>
+                <p>
+                  Total Winnings: {ethers.utils.formatEther(winnings.toString())}
+                  {" "}
+                  {currency}
+                </p>
+                <br />
+                <p>Click here to withdraw</p>
+              </button>
+            </div>
+          )
+        }
         {/* The Next Draw box */}
         <div className="space-y-5 md:space-y-0 m-5 md:flex md:flex-row items-start justify-center flex-1 md:space-x-5">
           <div className="stats-container">
